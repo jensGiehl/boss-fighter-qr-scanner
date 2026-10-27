@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CardValidator {
-    private static final Set<String> VARIABLES = Set.of("name", "cardNumber", "deckName", "qrValue");
+    private static final Set<String> VARIABLES = Set.of("name", "deckName", "qrValue");
     private static final Set<String> SOURCES = Set.of("base-game", "promo", "jungle-fever");
     private final CatalogService catalog;
     private final DescriptionRenderer renderer;
@@ -26,7 +26,6 @@ public class CardValidator {
             throw new ApiException(HttpStatus.BAD_REQUEST, "Kartendaten fehlen.");
         }
         requiredText(errors, "qrValue", request.qrValue(), 2048, "QR-Code");
-        requiredText(errors, "cardNumber", request.cardNumber(), 40, "Kartennummer");
         requiredText(errors, "name", request.name(), 50, "Name");
         if (!SOURCES.contains(request.sourceId())) {
             errors.put("sourceId", "Bitte eine gültige Herkunft auswählen.");
@@ -40,7 +39,7 @@ public class CardValidator {
         var effectIds = validateEffects(request, errors);
         validateDescription(request, effectIds, errors);
         if (errors.isEmpty()) {
-            var text = renderer.render(request.name().strip(), request.cardNumber().strip(), request.deckId(),
+            var text = renderer.render(request.name().strip(), request.deckId(),
                     request.qrValue(), request.effects(), request.description());
             if (length(text) > 400) {
                 errors.put("description", "Die Beschreibung darf einschließlich Symbolen und Variablen höchstens 400 Zeichen enthalten.");

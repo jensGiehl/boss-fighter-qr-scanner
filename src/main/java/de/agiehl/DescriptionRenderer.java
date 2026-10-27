@@ -13,7 +13,7 @@ public class DescriptionRenderer {
         this.catalog = catalog;
     }
 
-    public String render(String name, String cardNumber, String deckId, String qrValue,
+    public String render(String name, String deckId, String qrValue,
                          List<CardModels.Effect> effects, List<CardModels.DescriptionToken> description) {
         var byId = effects.stream().collect(Collectors.toMap(CardModels.Effect::id, Function.identity()));
         var result = new StringBuilder();
@@ -24,7 +24,6 @@ public class DescriptionRenderer {
                 case "effect" -> effectText(byId.get(token.effectId()));
                 case "variable" -> switch (token.variable()) {
                     case "name" -> name;
-                    case "cardNumber" -> cardNumber;
                     case "deckName" -> deckName(deckId);
                     case "qrValue" -> qrValue;
                     default -> "";

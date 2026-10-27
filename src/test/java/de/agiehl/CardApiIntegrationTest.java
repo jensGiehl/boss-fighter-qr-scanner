@@ -46,6 +46,7 @@ class CardApiIntegrationTest {
     void defaultsMissingSourcesToBaseGame() throws Exception {
         var created = parse(send("POST", "/api/cards", card("source://default", "Bestehender Client")));
         assertThat(created.path("sourceId").asString()).isEqualTo("base-game");
+        assertThat(created.has("cardNumber")).isFalse();
     }
 
     @ParameterizedTest
@@ -322,7 +323,6 @@ class CardApiIntegrationTest {
     private Map<String, Object> card(String qrValue, String name) {
         var body = new HashMap<String, Object>();
         body.put("qrValue", qrValue);
-        body.put("cardNumber", "42");
         body.put("name", name);
         body.put("deckId", "druid");
         body.put("effects", List.of(effect("melee", 3, null)));

@@ -158,16 +158,19 @@ test('card sources persist per card and the next-card preference survives reload
     await browser.send('Page.addScriptToEvaluateOnNewDocument', { source: `Object.defineProperty(navigator, 'mediaDevices', { value: { addEventListener() {}, removeEventListener() {}, async getUserMedia() { throw new DOMException('Test camera unavailable', 'NotFoundError'); } } });` });
     await reload();
     await begin('source://jungle');
+    assert.equal(await browser.evaluate(`document.querySelector('#cardNumber')`), null);
+    assert.equal(await browser.evaluate(`document.activeElement.id`), 'cardName');
     assert.equal(await source(), 'base-game');
     assert.deepEqual(await browser.evaluate(`Array.from(document.querySelector('#sourceId').options, option => option.textContent)`), ['Basisspiel', 'Promo', 'Jungle Fever (Erweiterung)']);
     await choose('jungle-fever');
-    await browser.evaluate(`document.querySelector('#cardNumber').value = '42'; document.querySelector('#cardName').value = 'Dschungelkarte';`);
+    await browser.evaluate(`document.querySelector('#cardName').value = 'Dschungelkarte';`);
     await click('#deckButtons [data-id="druid"]');
     await click('#effectChoices [aria-label="Weitere Aktion hinzufügen"]');
     assert.ok(await browser.evaluate('document.documentElement.scrollWidth <= innerWidth'));
     await click('#saveButton');
     await browser.waitFor(`!document.querySelector('#lastSaved').hidden && document.querySelector('#cardFields').disabled`);
     assert.equal(app.writes[0].payload.sourceId, 'jungle-fever');
+    assert.equal(Object.hasOwn(app.writes[0].payload, 'cardNumber'), false);
     await begin('source://next');
     assert.equal(await source(), 'jungle-fever');
     await choose('promo');
@@ -229,7 +232,6 @@ test('new effects survive mobile editing and persistence in a real browser', { s
     await browser.evaluate(`document.querySelector('#manualDetails').open = true;`);
     await fill('#manualQr', 'effects-mobile-qr');
     await click('#manualButton');
-    await fill('#cardNumber', '042');
     await fill('#cardName', 'Neue Effekte');
     await click('#deckButtons [data-id="warrior"]');
 

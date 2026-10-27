@@ -12,3 +12,17 @@ CREATE TABLE cards (
 
 INSERT INTO cards (version, qr_value, card_number, name, deck_id, created_at, updated_at)
 VALUES (0, 'legacy://card', '42', 'Waldwächter', 'druid', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+CREATE TABLE card_description (
+    card_id BIGINT NOT NULL,
+    token_position INTEGER NOT NULL,
+    kind VARCHAR(10) NOT NULL,
+    token_text VARCHAR(800),
+    symbol_id VARCHAR(40),
+    effect_id VARCHAR(36),
+    variable_name VARCHAR(20),
+    PRIMARY KEY (card_id, token_position)
+);
+
+INSERT INTO card_description (card_id, token_position, kind, variable_name)
+VALUES (1, 0, 'variable', 'cardNumber');

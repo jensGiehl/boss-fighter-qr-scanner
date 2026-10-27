@@ -16,8 +16,8 @@ class CatalogAndDescriptionTest {
                 new CardModels.DescriptionToken("variable", null, null, null, "deckName"));
         var original = new DescriptionRenderer(new CatalogService(catalog("Nahkampf", "Druide")));
         var renamed = new DescriptionRenderer(new CatalogService(catalog("Schwertangriff", "Waldvolk")));
-        assertThat(original.render("Name", "42", "druid", "qr", List.of(effect), tokens)).isEqualTo("Nahkampf 3 / Druide");
-        assertThat(renamed.render("Name", "42", "druid", "qr", List.of(effect), tokens)).isEqualTo("Schwertangriff 3 / Waldvolk");
+        assertThat(original.render("Name", "druid", "qr", List.of(effect), tokens)).isEqualTo("Nahkampf 3 / Druide");
+        assertThat(renamed.render("Name", "druid", "qr", List.of(effect), tokens)).isEqualTo("Schwertangriff 3 / Waldvolk");
     }
 
     @Test

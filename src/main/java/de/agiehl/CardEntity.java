@@ -30,9 +30,6 @@ public class CardEntity {
     @Column(name = "qr_value", nullable = false, length = 4096)
     private String qrValue;
 
-    @Column(nullable = false, length = 80)
-    private String cardNumber;
-
     @Column(nullable = false, length = 100)
     private String name;
 
@@ -68,7 +65,6 @@ public class CardEntity {
 
     public void update(CardModels.CardRequest request) {
         qrValue = request.qrValue();
-        cardNumber = request.cardNumber().strip();
         name = request.name().strip();
         deckId = request.deckId();
         sourceId = request.sourceId();
@@ -82,7 +78,6 @@ public class CardEntity {
     public Long id() { return id; }
     public Long version() { return version; }
     public String qrValue() { return qrValue; }
-    public String cardNumber() { return cardNumber; }
     public String name() { return name; }
     public String deckId() { return deckId; }
     public String sourceId() { return sourceId; }

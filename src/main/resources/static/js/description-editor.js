@@ -1,6 +1,5 @@
 const VARIABLE_LABELS = {
     name: "Name",
-    cardNumber: "Kartennummer",
     deckName: "Deckname",
     qrValue: "QR-Wert"
 };

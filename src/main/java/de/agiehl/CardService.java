@@ -85,8 +85,8 @@ public class CardService {
     private CardModels.CardResponse response(CardEntity card) {
         var effects = card.effects();
         var description = card.description();
-        return new CardModels.CardResponse(card.id(), card.version(), card.qrValue(), card.cardNumber(), card.name(), card.deckId(), card.sourceId(), effects, description,
-                renderer.render(card.name(), card.cardNumber(), card.deckId(), card.qrValue(), effects, description), card.createdAt(), card.updatedAt());
+        return new CardModels.CardResponse(card.id(), card.version(), card.qrValue(), card.name(), card.deckId(), card.sourceId(), effects, description,
+                renderer.render(card.name(), card.deckId(), card.qrValue(), effects, description), card.createdAt(), card.updatedAt());
     }
 
     private static Specification<CardEntity> search(String query, String deckId) {
@@ -97,7 +97,6 @@ public class CardService {
                 var pattern = "%" + escaped + "%";
                 predicates.add(builder.or(
                         builder.like(builder.lower(root.get("name")), pattern, '\\'),
-                        builder.like(builder.lower(root.get("cardNumber")), pattern, '\\'),
                         builder.like(builder.lower(root.get("qrValue")), pattern, '\\')));
             }
             if (deckId != null && !deckId.isBlank()) {

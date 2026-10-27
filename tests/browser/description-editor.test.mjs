@@ -10,7 +10,7 @@ test('description editor in a real browser', { skip, timeout: 30_000 }, async t 
     await browser.evaluate(`(async () => {
       document.body.innerHTML = '<div id="editor"></div><output id="counter"></output><button id="toolbar">Effekt</button>';
       const { DescriptionEditor } = await import(URL.createObjectURL(new Blob([${JSON.stringify(source)}], { type: 'text/javascript' })));
-      window.ctx = { name: 'Karte', cardNumber: '42', deckId: 'warrior', qrValue: 'QR', effects: [{ id: 'effect1', typeId: 'melee', value: 3 }] };
+      window.ctx = { name: 'Karte', deckId: 'warrior', qrValue: 'QR', effects: [{ id: 'effect1', typeId: 'melee', value: 3 }] };
       window.invalid = null;
       window.editor = new DescriptionEditor({ element: document.querySelector('#editor'), counter: document.querySelector('#counter'), catalog: { symbols: [{ id: 'star', name: 'Stern', icon: '★' }], effectTypes: [{ id: 'melee', name: 'Nahkampf', icon: '⚔' }, { id: 'other', name: 'Sonstige', icon: '✱' }], decks: [{ id: 'warrior', name: 'Krieger' }] }, getContext: () => window.ctx, onInvalid: message => { window.invalid = message; } });
     })()`);

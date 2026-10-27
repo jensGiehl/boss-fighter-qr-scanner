@@ -68,7 +68,7 @@ Die lokale Anwendung ist unter [http://localhost:8080](http://localhost:8080) er
 
 1. **Kamera starten** wählen und den Kamerazugriff im Browser erlauben. Bei mehreren Kameras lässt sich die Kamera umschalten; auf Mobilgeräten wird die Rückkamera bevorzugt.
 2. Einen QR-Code ins Bild halten. Nach der Erkennung erscheint sein Wert und die Kamera wird ausgeschaltet.
-3. Herkunft, Kartennummer, Name, Deck, Effekte und Beschreibung erfassen. Der Fokus liegt direkt auf der Kartennummer; die weitere Erfassung ist auch mit der Tastatur möglich.
+3. Herkunft, Name, Deck, Effekte und Beschreibung erfassen. Der Fokus liegt direkt auf dem Kartennamen; die weitere Erfassung ist auch mit der Tastatur möglich.
 4. **Speichern & weiter** speichert die Karte und aktiviert die Kamera für den nächsten QR-Code.
 
 Die manuelle QR-Eingabe hilft, wenn keine Kamera verfügbar ist oder ein Code schlecht lesbar ist. Über die Kartenliste lassen sich bereits erfasste Karten suchen und zur Bearbeitung öffnen. Der Name ist auf 50 Zeichen begrenzt, die gerenderte Beschreibung auf 400 Zeichen.
@@ -77,11 +77,13 @@ Als **Herkunft** stehen **Basisspiel**, **Promo** und **[Jungle Fever (Erweiteru
 
 Die Karten-API verwendet dafür `sourceId` mit `base-game`, `promo` oder `jungle-fever`. Fehlt das Feld in einer Anfrage, wird zur Kompatibilität mit bisherigen Clients `base-game` verwendet; unbekannte Werte werden abgewiesen.
 
+Karten besitzen keine Kartennummer. Bei bestehenden Datenbanken wird das frühere Nummernfeld beim Start entfernt; bereits eingefügte Nummernvariablen bleiben als normaler Beschreibungstext erhalten.
+
 Jeder QR-Wert kann nur einmal gespeichert werden. Ein bereits vorhandener QR-Code wird als Konflikt gemeldet. Eine Versionsprüfung verhindert, dass parallele Bearbeitungen dieselbe Karte unbemerkt überschreiben; in diesem Fall die aktuelle Karte neu laden.
 
 Decks werden als große Symbolbuttons mit kleinen Beschriftungen angeboten. Effekte können hinzugefügt, geändert, mit Pfeilen sortiert und gelöscht werden. Für numerische Effektwerte sind Ganzzahlen von −9999 bis 9999 erlaubt. **Karten ziehen**, **Heilen**, **Gift zufügen** und **Direkter Schaden** besitzen jeweils einen Zahlenwert. **Weitere Aktion** wird mit einem Blitz dargestellt und benötigt keinen Zahlenwert; beim Wechsel zu diesem Typ wird ein vorheriger Wert entfernt. Gift verwendet einen grünen Tropfen, direkter Schaden ein gebrochenes Herz. Der Effekt **Sonstige** besitzt einen zusätzlichen Namen im Format einer Java-Konstante, beispielsweise `POISON_EXPLOSION`; sein numerischer Wert ist optional. Bereits verwendete Namen stehen als Autovervollständigung zur Verfügung.
 
-Der Beschreibungseditor unterstützt Fließtext, neun Symbole und Effektvariablen. Ein Effekt kann an der aktuellen Textposition eingefügt werden; seine Darstellung bleibt mit dem zugehörigen Effekt verbunden. Aus **Nahkampf 3** wird deshalb automatisch **Nahkampf 4**, sobald der Effektwert geändert wird. Die Zuordnung bleibt auch beim Umsortieren erhalten. Beim Löschen eines noch in der Beschreibung verwendeten Effekts werden seine Verweise in den aktuell angezeigten normalen Text umgewandelt. Zusätzlich lassen sich Kartenname, Kartennummer, Deckname und QR-Wert als Variablen einfügen.
+Der Beschreibungseditor unterstützt Fließtext, neun Symbole und Effektvariablen. Ein Effekt kann an der aktuellen Textposition eingefügt werden; seine Darstellung bleibt mit dem zugehörigen Effekt verbunden. Aus **Nahkampf 3** wird deshalb automatisch **Nahkampf 4**, sobald der Effektwert geändert wird. Die Zuordnung bleibt auch beim Umsortieren erhalten. Beim Löschen eines noch in der Beschreibung verwendeten Effekts werden seine Verweise in den aktuell angezeigten normalen Text umgewandelt. Zusätzlich lassen sich Kartenname, Deckname und QR-Wert als Variablen einfügen.
 
 **Strg+Enter** bzw. **Cmd+Enter** speichert die aktuelle Karte. Die Deckauswahl kann für die nächste Karte gemerkt werden.
 

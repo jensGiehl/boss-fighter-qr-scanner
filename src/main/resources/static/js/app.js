@@ -90,7 +90,7 @@ function markDirty() {
 }
 
 function context() {
-  return { name: $('cardName').value, cardNumber: $('cardNumber').value, deckId: state.deckId, sourceId: $('sourceId').value, qrValue: state.qrValue, effects: state.effects };
+  return { name: $('cardName').value, deckId: state.deckId, sourceId: $('sourceId').value, qrValue: state.qrValue, effects: state.effects };
 }
 
 function effectLabel(effect) {
@@ -275,7 +275,7 @@ function resetEntry() {
   $('cardForm').reset();
   $('sourceId').value = rememberedSource();
   $('rememberDeck').checked = rememberDeck;
-  $('cardNumber').value = ''; $('cardName').value = ''; $('nameCounter').textContent = '0 / 50';
+  $('cardName').value = ''; $('nameCounter').textContent = '0 / 50';
   editor?.setSegments([]); clearErrors(); paintDeckSelection(); paintEffects(); updateReferences();
   $('qrValue').textContent = 'Noch keine Karte gescannt'; $('qrCheck').hidden = true;
   $('captureHeading').replaceChildren(document.createTextNode('Karten erfassen'), node('span', 'heading-dot', '.'));
@@ -290,7 +290,7 @@ function beginEntry(qrValue, card = null) {
   state.active = true; state.card = card; state.qrValue = qrValue; state.effects = card ? structuredClone(card.effects) : []; state.dirty = false;
   if (card) state.deckId = card.deckId;
   $('sourceId').value = card ? card.sourceId || 'base-game' : rememberedSource();
-  $('cardNumber').value = card?.cardNumber || ''; $('cardName').value = card?.name || '';
+  $('cardName').value = card?.name || '';
   $('nameCounter').textContent = `${Array.from($('cardName').value).length} / 50`;
   $('qrValue').textContent = qrValue; $('qrCheck').hidden = false;
   clearErrors(); paintDeckSelection(); paintEffects(); editor.setSegments(card?.description || []); updateReferences();
@@ -303,7 +303,7 @@ function beginEntry(qrValue, card = null) {
   $('cameraHint').textContent = 'QR erkannt · Kamera pausiert';
   $('cameraPlaceholder').replaceChildren(node('span', 'camera-symbol', '✓'), node('strong', '', 'QR-Code erfasst'), node('span', '', 'Ergänze die Karte und speichere sie.'));
   setEntryEnabled(true); showCapture();
-  $('cardNumber').focus({ preventScroll: true });
+  $('cardName').focus({ preventScroll: true });
   if (matchMedia('(max-width: 899px)').matches) $('entryHeading').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -346,7 +346,6 @@ function validate() {
   clearErrors();
   let valid = true;
   const fail = (field, message) => { fieldError(field, message); valid = false; };
-  if (!$('cardNumber').value.trim()) fail('cardNumber', 'Bitte eine Kartennummer eingeben.');
   if (!$('cardName').value.trim()) fail('name', 'Bitte einen Namen eingeben.');
   if (Array.from($('cardName').value).length > 50) fail('name', 'Der Name darf höchstens 50 Zeichen lang sein.');
   if (!state.deckId) fail('deckId', 'Bitte ein Deck auswählen.');
@@ -371,7 +370,7 @@ function validate() {
 async function saveCard(event) {
   event?.preventDefault();
   if (!state.active || state.saving || !validate()) return;
-  const payload = { ...context(), name: $('cardName').value.trim(), cardNumber: $('cardNumber').value.trim(), description: editor.getSegments(), version: state.card?.version ?? null };
+  const payload = { ...context(), name: $('cardName').value.trim(), description: editor.getSegments(), version: state.card?.version ?? null };
   state.saving = true; setEntryEnabled(true); $('saveButton').textContent = 'Wird gespeichert …';
   $('cameraButton').disabled = true; $('discardButton').disabled = true;
   document.body.classList.add('saving');
@@ -383,7 +382,7 @@ async function saveCard(event) {
     if (!editing) state.session++;
     $('sessionCount').textContent = String(state.session);
     $('lastSaved').hidden = false; $('lastSavedName').textContent = saved.name;
-    $('lastSavedMeta').textContent = `#${saved.cardNumber} · ${state.catalog.decks.find(deck => deck.id === saved.deckId)?.name || saved.deckId} · ${sourceLabel(saved.sourceId)}`;
+    $('lastSavedMeta').textContent = `${state.catalog.decks.find(deck => deck.id === saved.deckId)?.name || saved.deckId} · ${sourceLabel(saved.sourceId)}`;
     resetEntry();
     notify(`${saved.name} wurde gespeichert. Bereit für die nächste Karte.`);
     updateCount();
@@ -432,7 +431,7 @@ async function loadCards() {
       const row = node('article', 'card-list-row');
       const title = node('div', 'card-title');
       const labels = node('div'); labels.append(node('strong', '', card.name), node('small', '', card.qrValue));
-      title.append(node('span', 'card-number', `#${card.cardNumber}`), labels);
+      title.append(labels);
       const tags = node('div', 'card-tags');
       const deck = state.catalog.decks.find(item => item.id === card.deckId);
       tags.append(node('span', 'card-tag', `${deck?.icon || ''} ${deck?.name || card.deckId}`));
@@ -490,8 +489,6 @@ $('captureTab').addEventListener('click', async () => { const wasHidden = $('cap
 $('libraryTab').addEventListener('click', showLibrary);
 $('newCardButton').addEventListener('click', async () => { if (allowDiscard()) { resetEntry(); showCapture(); await scanner.start($('cameraSelect').value || undefined); } });
 $('lastSavedEdit').addEventListener('click', () => { if (state.lastSaved) editCard(state.lastSaved.id); });
-$('cardNumber').addEventListener('input', () => { markDirty(); updateReferences(); });
-$('cardNumber').addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); $('cardName').focus(); } });
 $('cardName').addEventListener('input', () => {
   const characters = Array.from($('cardName').value);
   if (characters.length > 50) $('cardName').value = characters.slice(0, 50).join('');

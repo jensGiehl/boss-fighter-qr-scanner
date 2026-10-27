@@ -11,14 +11,14 @@ public final class CardModels {
 
     public record DescriptionToken(String kind, String text, String symbolId, String effectId, String variable) {}
 
-    public record CardRequest(Long version, String qrValue, String cardNumber, String name, String deckId, String sourceId,
+    public record CardRequest(Long version, String qrValue, String name, String deckId, String sourceId,
                               List<Effect> effects, List<DescriptionToken> description) {
         public CardRequest {
             sourceId = sourceId == null ? "base-game" : sourceId;
         }
     }
 
-    public record CardResponse(Long id, Long version, String qrValue, String cardNumber, String name, String deckId, String sourceId,
+    public record CardResponse(Long id, Long version, String qrValue, String name, String deckId, String sourceId,
                                List<Effect> effects, List<DescriptionToken> description, String descriptionText,
                                Instant createdAt, Instant updatedAt) {}
 
