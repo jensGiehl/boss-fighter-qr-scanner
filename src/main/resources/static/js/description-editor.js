@@ -29,6 +29,7 @@ export class DescriptionEditor {
         this.element.style.whiteSpace = "pre-wrap";
         this.element.spellcheck = true;
         this.handleSelectionChange = () => {
+            if (!this.element.contains(document.activeElement)) return;
             const selection = this.captureSelection();
             if (selection) this.savedSelection = selection;
         };
@@ -101,7 +102,7 @@ export class DescriptionEditor {
         const length = this.logicalLength(this.segments);
         const next = [...this.getSegments()];
         const text = this.getText();
-        if (text && !/\s$/.test(text)) next.push({kind: "text", text: " "});
+        if (text && !text.endsWith("\n")) next.push({kind: "text", text: "\n"});
         next.push({kind: "effect", effectId: String(effectId)});
         const end = this.logicalLength(next);
         this.beforeInputSelection = selection;
@@ -113,6 +114,22 @@ export class DescriptionEditor {
     insertVariable(variable) {
         if (!Object.hasOwn(VARIABLE_LABELS, variable)) return false;
         return this.insertSegments([{kind: "variable", variable}]);
+    }
+
+    reorderEffectReferences() {
+        const order = new Map((this.getContext().effects ?? []).map((effect, index) => [String(effect.id), index]));
+        const reorder = segments => {
+            const references = segments.filter(segment => segment.kind === "effect")
+                .sort((first, second) => (order.get(first.effectId) ?? Infinity) - (order.get(second.effectId) ?? Infinity));
+            let index = 0;
+            return segments.map(segment => segment.kind === "effect" ? {...references[index++]} : {...segment});
+        };
+        const selection = this.element.contains(document.activeElement)
+            ? this.captureSelection() ?? this.savedSelection
+            : this.savedSelection;
+        this.beforeInputSelection = selection;
+        this.commit(reorder(this.segments), selection, false);
+        this.history = this.history.map(entry => ({...entry, segments: reorder(entry.segments)}));
     }
 
     removeEffectReferences(effectId) {

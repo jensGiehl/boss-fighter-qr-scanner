@@ -254,7 +254,19 @@ test('new effects survive mobile editing and persistence in a real browser', { s
       const effectIds = await browser.evaluate(`Array.from(document.querySelectorAll('#effectRows .effect-row'), row => row.dataset.id)`);
       assert.deepEqual(await browser.evaluate(`Array.from(document.querySelectorAll('#descriptionEditor [data-kind="effect"]'), token => token.dataset.effectId)`), effectIds);
       assert.deepEqual(await references(), ['Karten ziehen 2', 'Heilen 3', 'Weitere Aktion', 'Gift zufügen 4', 'Direkter Schaden 5']);
+      assert.equal(await browser.evaluate(`document.querySelector('#descriptionEditor').textContent`), 'Karten ziehen 2\nHeilen 3\nWeitere Aktion\nGift zufügen 4\nDirekter Schaden 5');
+      const tops = await browser.evaluate(`Array.from(document.querySelectorAll('#descriptionEditor [data-kind="effect"]'), token => token.getBoundingClientRect().top)`);
+      assert.ok(tops.every((top, index) => index === 0 || top > tops[index - 1]), 'Each effect reference must occupy a separate visible line');
       assert.equal(await browser.evaluate('document.activeElement.classList.contains("effect-value")'), true);
+    });
+
+    await t.test('moving effects in either direction also moves their description references', async () => {
+      await click('#effectRows .effect-row:first-child [aria-label="Effekt 1 nach unten"]');
+      assert.deepEqual((await rows()).map(effect => effect.typeId), ['heal', 'draw', 'extra-action', 'poison', 'direct-damage']);
+      assert.deepEqual(await references(), ['Heilen 3', 'Karten ziehen 2', 'Weitere Aktion', 'Gift zufügen 4', 'Direkter Schaden 5']);
+      await click('#effectRows .effect-row:nth-child(2) [aria-label="Effekt 2 nach oben"]');
+      assert.deepEqual((await rows()).map(effect => effect.typeId), addedTypes.map(type => type.id));
+      assert.deepEqual(await references(), ['Karten ziehen 2', 'Heilen 3', 'Weitere Aktion', 'Gift zufügen 4', 'Direkter Schaden 5']);
     });
 
     await t.test('switching between numeric effects and further actions refreshes references and clears stale numbers', async () => {
@@ -327,13 +339,20 @@ test('new effects survive mobile editing and persistence in a real browser', { s
       assert.deepEqual(await references(), ['Karten ziehen 9', 'Heilen 3', 'Weitere Aktion', 'Gift zufügen 4', 'Direkter Schaden 5']);
       await fill('#effectRows .effect-row:nth-child(4) .effect-value', 6);
       assert.equal((await references())[3], 'Gift zufügen 6');
+      await click('#effectRows .effect-row:nth-child(4) [aria-label="Effekt 4 nach oben"]');
+      assert.deepEqual(await references(), ['Karten ziehen 9', 'Heilen 3', 'Gift zufügen 6', 'Weitere Aktion', 'Direkter Schaden 5']);
       await click('#saveButton');
       await browser.waitFor(`document.querySelector('#cardFields').disabled && !document.body.classList.contains('saving')`);
       assert.equal(app.writes.length, 2);
       assert.equal(app.writes[1].method, 'PUT');
-      assert.equal(app.writes[1].payload.effects[2].value, null);
-      assert.equal(app.writes[1].payload.effects[3].value, 6);
+      assert.equal(app.writes[1].payload.effects[2].value, 6);
+      assert.equal(app.writes[1].payload.effects[3].value, null);
+      assert.deepEqual(app.writes[1].payload.description.filter(segment => segment.kind === 'effect').map(segment => segment.effectId), app.writes[1].payload.effects.map(effect => effect.id));
       assert.equal(app.writes[1].payload.version, 0);
+      await click('#lastSavedEdit');
+      await browser.waitFor(`!document.querySelector('#cardFields').disabled`);
+      assert.deepEqual((await rows()).map(effect => effect.typeId), ['draw', 'heal', 'poison', 'extra-action', 'direct-damage']);
+      assert.deepEqual(await references(), ['Karten ziehen 9', 'Heilen 3', 'Gift zufügen 6', 'Weitere Aktion', 'Direkter Schaden 5']);
       assert.deepEqual(app.failures, []);
       assert.deepEqual(browser.exceptions, [], 'The application must not throw unhandled browser errors');
     });

@@ -100,11 +100,11 @@ test('description editor in a real browser', { skip, timeout: 30_000 }, async t 
         document.querySelector('#toolbar').focus();
         editor.appendEffect('effect1');
       })()`);
-      assert.equal(await browser.evaluate('editor.getText()'), 'Vorhandener Text Nahkampf 3');
+      assert.equal(await browser.evaluate('editor.getText()'), 'Vorhandener Text\nNahkampf 3');
       assert.equal(await browser.evaluate('document.activeElement.id'), 'toolbar');
       assert.deepEqual(await browser.evaluate('editor.savedSelection'), { start: 0, end: 11, backward: false });
       await browser.evaluate("ctx.effects[0].value = 4; editor.refreshReferences();");
-      assert.equal(await browser.evaluate('editor.getText()'), 'Vorhandener Text Nahkampf 4');
+      assert.equal(await browser.evaluate('editor.getText()'), 'Vorhandener Text\nNahkampf 4');
     });
 
     await t.test('automatic references above the limit remain visible and removal restores validity', async () => {
@@ -112,7 +112,28 @@ test('description editor in a real browser', { skip, timeout: 30_000 }, async t 
       assert.ok((await browser.evaluate('editor.getSegments()')).some(segment => segment.kind === 'effect'));
       assert.match(await browser.evaluate('invalid'), /410/);
       await browser.evaluate("editor.removeEffectReferences('effect1');");
-      assert.equal(await browser.evaluate('editor.getText()'), 'a'.repeat(399) + ' ');
+      assert.equal(await browser.evaluate('editor.getText()'), 'a'.repeat(399) + '\n');
+      assert.equal(await browser.evaluate('invalid'), null);
+    });
+
+    await t.test('effect lines follow the effect order by ID while preserving text and history validity', async () => {
+      await browser.evaluate(String.raw`(() => {
+        ctx.effects = [
+          { id: 'first', typeId: 'melee', value: 1 },
+          { id: 'second', typeId: 'melee', value: 2 },
+          { id: 'third', typeId: 'other', customName: 'BONUS', value: null }
+        ];
+        editor.setSegments([{ kind: 'text', text: 'Vorspann\n' }]);
+        for (const effect of ctx.effects) editor.appendEffect(effect.id);
+      })()`);
+      assert.equal(await browser.evaluate('editor.getText()'), 'Vorspann\nNahkampf 1\nNahkampf 2\nBONUS');
+      await browser.evaluate('ctx.effects.reverse(); editor.reorderEffectReferences();');
+      assert.equal(await browser.evaluate('editor.getText()'), 'Vorspann\nBONUS\nNahkampf 2\nNahkampf 1');
+      assert.deepEqual(await browser.evaluate("editor.getSegments().filter(segment => segment.kind === 'effect').map(segment => segment.effectId)"), ['third', 'second', 'first']);
+      await browser.evaluate('editor.restoreHistory(-1);');
+      assert.deepEqual(await browser.evaluate("editor.getSegments().filter(segment => segment.kind === 'effect').map(segment => segment.effectId)"), ['third', 'second', 'first']);
+      await browser.evaluate('editor.restoreHistory(1);');
+      assert.equal(await browser.evaluate('editor.getText()'), 'Vorspann\nBONUS\nNahkampf 2\nNahkampf 1');
       assert.equal(await browser.evaluate('invalid'), null);
     });
   } finally { await browser.close(); }

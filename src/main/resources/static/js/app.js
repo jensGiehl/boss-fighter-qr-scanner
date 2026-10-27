@@ -235,6 +235,7 @@ function paintEffects() {
     const move = direction => {
       const target = index + direction;
       [state.effects[index], state.effects[target]] = [state.effects[target], state.effects[index]];
+      editor.reorderEffectReferences();
       paintEffects(); markDirty(); updateReferences();
       $('effectRows').querySelector(`[data-id="${effect.id}"] .form-select`)?.focus();
     };
