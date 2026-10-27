@@ -88,13 +88,29 @@ class CardApiIntegrationTest {
     @Test
     void exposesCatalogHealthAndLocalWebjars() throws Exception {
         var catalog = parse(send("GET", "/api/catalog", null));
-        assertThat(catalog.path("decks").size()).isEqualTo(10);
+        assertThat(catalog.path("decks").size()).isEqualTo(11);
         assertThat(catalog.path("decks").get(0).path("name").asString()).isEqualTo("Druide");
+        assertThat(catalogItem(catalog.path("decks"), "items").path("name").asString()).isEqualTo("Gegenstände");
         assertThat(catalog.path("effectTypes").size()).isEqualTo(10);
         assertThat(catalog.path("symbols").size()).isEqualTo(9);
         assertThat(parse(send("GET", "/actuator/health", null)).path("status").asString()).isEqualTo("UP");
         assertThat(send("GET", "/webjars/bootstrap/5.3.8/css/bootstrap.min.css", null).statusCode()).isEqualTo(200);
         assertThat(send("GET", "/webjars/jsqr/1.4.0/dist/jsQR.js", null).statusCode()).isEqualTo(200);
+    }
+
+    @Test
+    void capturesItemsAndFiltersThemByDeck() throws Exception {
+        var body = card("items://ring", "Zauberring");
+        body.put("deckId", "items");
+        body.put("description", List.of(new CardModels.DescriptionToken("variable", null, null, null, "deckName")));
+        var createdResponse = send("POST", "/api/cards", body);
+        assertThat(createdResponse.statusCode()).isEqualTo(201);
+        var created = parse(createdResponse);
+        assertThat(created.path("deckId").asString()).isEqualTo("items");
+        assertThat(created.path("descriptionText").asString()).isEqualTo("Gegenstände");
+        var filtered = parse(send("GET", "/api/cards?deckId=items", null));
+        assertThat(filtered.path("totalElements").asLong()).isEqualTo(1);
+        assertThat(filtered.path("content").get(0).path("id")).isEqualTo(created.path("id"));
     }
 
     @Test

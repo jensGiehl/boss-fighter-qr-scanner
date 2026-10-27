@@ -28,7 +28,8 @@ const catalog = {
     { id: 'troll', name: 'Troll', icon: '👹' },
     { id: 'shaman', name: 'Schamane', icon: '🪶' },
     { id: 'rogue', name: 'Schurke', icon: '🗡️' },
-    { id: 'mage', name: 'Magier', icon: '🪄' }
+    { id: 'mage', name: 'Magier', icon: '🪄' },
+    { id: 'items', name: 'Gegenstände', icon: '🎒' }
   ],
   effectTypes: [
     { id: 'melee', name: 'Nahkampf', icon: '⚔️', valueLabel: 'Schaden' },
@@ -164,15 +165,19 @@ test('card sources persist per card and the next-card preference survives reload
     assert.deepEqual(await browser.evaluate(`Array.from(document.querySelector('#sourceId').options, option => option.textContent)`), ['Basisspiel', 'Promo', 'Jungle Fever (Erweiterung)']);
     await choose('jungle-fever');
     await browser.evaluate(`document.querySelector('#cardName').value = 'Dschungelkarte';`);
-    await click('#deckButtons [data-id="druid"]');
+    assert.equal(await browser.evaluate(`document.querySelector('#deckButtons [data-id="items"]').getAttribute('aria-label')`), 'Deck Gegenstände');
+    assert.equal(await browser.evaluate(`document.querySelector('#deckFilter option[value="items"]').textContent`), 'Gegenstände');
+    await click('#deckButtons [data-id="items"]');
     await click('#effectChoices [aria-label="Weitere Aktion hinzufügen"]');
     assert.ok(await browser.evaluate('document.documentElement.scrollWidth <= innerWidth'));
     await click('#saveButton');
     await browser.waitFor(`!document.querySelector('#lastSaved').hidden && document.querySelector('#cardFields').disabled`);
     assert.equal(app.writes[0].payload.sourceId, 'jungle-fever');
+    assert.equal(app.writes[0].payload.deckId, 'items');
     assert.equal(Object.hasOwn(app.writes[0].payload, 'cardNumber'), false);
     await begin('source://next');
     assert.equal(await source(), 'jungle-fever');
+    assert.equal(await browser.evaluate(`document.querySelector('#deckButtons [data-id="items"]').getAttribute('aria-pressed')`), 'true');
     await choose('promo');
     await browser.evaluate(`window.confirm = () => true;`);
     await click('#discardButton');

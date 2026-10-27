@@ -97,7 +97,7 @@ Für Smartphone-Erfassung die Anwendung über einen HTTPS-Reverse-Proxy mit eine
 
 Decknamen und Symbole, Effekttypen und Beschreibungssymbole werden per YAML konfiguriert. Die Vorgabekonfiguration ist `src/main/resources/catalog.yaml`. Für eigene Symbole zunächst die dortige Datei kopieren und die Einträge anpassen. Die Katalogdatei wird beim Start eingelesen; nach Änderungen die Anwendung neu starten.
 
-Die Standarddecks sind Druide, Barbar, Halbling, Zwerg, Elfe, Krieger, Troll, Schamane (🪶), Schurke und Magier. Die Standardeffekte sind Nahkampf, Nahkampf-Verstärkung, Fernkampf, Fernkampf-Verstärkung, Karten ziehen, Heilen, Weitere Aktion, Gift zufügen, Direkter Schaden und Sonstige. Für die Beschreibung stehen Schwert, Schild, Feuer, Herz, Blitz, Stern, Karten ziehen, Gift und Gebrochenes Herz bereit.
+Die Standarddecks sind Druide, Barbar, Halbling, Zwerg, Elfe, Krieger, Troll, Schamane (🪶), Schurke, Magier und **Gegenstände (🎒)**. Gegenstände lassen sich wie die anderen Decks auswählen, für die nächste Karte merken und in der Kartenliste filtern. Die Standardeffekte sind Nahkampf, Nahkampf-Verstärkung, Fernkampf, Fernkampf-Verstärkung, Karten ziehen, Heilen, Weitere Aktion, Gift zufügen, Direkter Schaden und Sonstige. Für die Beschreibung stehen Schwert, Schild, Feuer, Herz, Blitz, Stern, Karten ziehen, Gift und Gebrochenes Herz bereit.
 
 Die Konfigurationsfelder sehen so aus; dieser Auszug zeigt nur einige Einträge:
 

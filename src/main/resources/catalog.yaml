@@ -31,6 +31,9 @@ scanner:
       - id: mage
         name: Magier
         icon: "🪄"
+      - id: items
+        name: Gegenstände
+        icon: "🎒"
     effect-types:
       - id: melee
         name: Nahkampf
