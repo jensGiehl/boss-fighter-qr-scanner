@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: bossqr-card-scanner
+  main:
+    banner-mode: "off"
+  config:
+    import:
+      - classpath:catalog.yaml
+      - optional:file:${CATALOG_FILE:./config/catalog.yaml}
+  datasource:
+    url: jdbc:h2:file:${DB_PATH:./data/cards};DB_CLOSE_ON_EXIT=FALSE
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: true
+      accept-float-as-int: false
+server:
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: framework
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never

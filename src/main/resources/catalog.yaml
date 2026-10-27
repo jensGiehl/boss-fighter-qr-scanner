@@ -1,0 +1,102 @@
+scanner:
+  catalog:
+    decks:
+      - id: druid
+        name: Druide
+        icon: "🌿"
+      - id: barbarian
+        name: Barbar
+        icon: "🪓"
+      - id: halfling
+        name: Halbling
+        icon: "🍀"
+      - id: dwarf
+        name: Zwerg
+        icon: "🔨"
+      - id: elf
+        name: Elfe
+        icon: "🧝"
+      - id: warrior
+        name: Krieger
+        icon: "🛡️"
+      - id: troll
+        name: Troll
+        icon: "👹"
+      - id: shaman
+        name: Schamane
+        icon: "🪶"
+      - id: rogue
+        name: Schurke
+        icon: "🗡️"
+      - id: mage
+        name: Magier
+        icon: "🪄"
+    effect-types:
+      - id: melee
+        name: Nahkampf
+        icon: "⚔️"
+        value-label: Schaden
+      - id: melee-boost
+        name: Nahkampf-Verstärkung
+        icon: "⚔️⁺"
+        value-label: Verstärkung
+      - id: ranged
+        name: Fernkampf
+        icon: "🏹"
+        value-label: Schaden
+      - id: ranged-boost
+        name: Fernkampf-Verstärkung
+        icon: "🏹⁺"
+        value-label: Verstärkung
+      - id: draw
+        name: Karten ziehen
+        icon: "🃏"
+        value-label: Karten
+      - id: heal
+        name: Heilen
+        icon: "❤️"
+        value-label: Heilung
+      - id: extra-action
+        name: Weitere Aktion
+        icon: "⚡"
+        has-value: false
+      - id: poison
+        name: Gift zufügen
+        icon: "💧"
+        value-label: Gift
+      - id: direct-damage
+        name: Direkter Schaden
+        icon: "💔"
+        value-label: Schaden
+      - id: other
+        name: Sonstige
+        icon: "✳️"
+        value-label: Wert (optional)
+    symbols:
+      - id: sword
+        name: Schwert
+        icon: "⚔️"
+      - id: shield
+        name: Schild
+        icon: "🛡️"
+      - id: fire
+        name: Feuer
+        icon: "🔥"
+      - id: heart
+        name: Herz
+        icon: "❤️"
+      - id: lightning
+        name: Blitz
+        icon: "⚡"
+      - id: star
+        name: Stern
+        icon: "★"
+      - id: card-draw
+        name: Karten ziehen
+        icon: "🃏"
+      - id: poison
+        name: Gift
+        icon: "💧"
+      - id: broken-heart
+        name: Gebrochenes Herz
+        icon: "💔"

@@ -1,0 +1,16 @@
+services:
+  scanner:
+    build: .
+    image: bossqr-card-scanner:local
+    container_name: bossqr-card-scanner
+    ports:
+      - "8089:8080"
+    environment:
+      DB_PATH: /app/data/cards
+    volumes:
+      - card-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  card-data:
+    name: bossqr-card-scanner-data
