@@ -88,7 +88,7 @@ class CardApiIntegrationTest {
     @Test
     void exposesCatalogHealthAndLocalWebjars() throws Exception {
         var catalog = parse(send("GET", "/api/catalog", null));
-        assertThat(catalog.path("decks").size()).isEqualTo(24);
+        assertThat(catalog.path("decks").size()).isEqualTo(23);
         assertThat(catalog.path("decks").get(0).path("name").asString()).isEqualTo("Druide");
         var dryad = catalogItem(catalog.path("decks"), "dryad");
         assertThat(dryad.path("name").asString()).isEqualTo("Dryade");

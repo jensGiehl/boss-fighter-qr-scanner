@@ -15,7 +15,6 @@ const addedTypes = [
 const catalog = {
   decks: [
     { id: 'druid', name: 'Druide', icon: '🌿' },
-    { id: 'barbarian', name: 'Barbar', icon: '🪓' },
     { id: 'halfling', name: 'Halbling', icon: '🍀' },
     { id: 'dwarf', name: 'Zwerg', icon: '🔨' },
     { id: 'elf', name: 'Elfe', icon: '🧝' },

@@ -97,7 +97,7 @@ Für Smartphone-Erfassung die Anwendung über einen HTTPS-Reverse-Proxy mit eine
 
 Decknamen und Symbole, Effekttypen und Beschreibungssymbole werden per YAML konfiguriert. Die Vorgabekonfiguration ist `src/main/resources/catalog.yaml`. Für eigene Symbole zunächst die dortige Datei kopieren und die Einträge anpassen. Die Katalogdatei wird beim Start eingelesen; nach Änderungen die Anwendung neu starten.
 
-Die Standarddecks sind Druide, **Dryade**, **Goblin**, **Paladin**, Barbar, **Hügel-Halbling**, **Kupfer-Zwerg**, **Wald-Elfe**, Krieger, **Dschungel-Troll**, Schamane, Schurke, Magier, **Gegenstände (🎒)** und **Beute 1 bis 10**. Alle Decks lassen sich auswählen, für die nächste Karte merken und in der Kartenliste filtern. Dryade, Goblin und Paladin sind eigene Decks mit den technischen IDs `dryad`, `goblin` und `paladin`.
+Die Standarddecks sind Druide, **Dryade**, **Goblin**, **Paladin**, **Hügel-Halbling**, **Kupfer-Zwerg**, **Wald-Elfe**, Krieger, **Dschungel-Troll**, Schamane, Schurke, Magier, **Gegenstände (🎒)** und **Beute 1 bis 10**. Alle Decks lassen sich auswählen, für die nächste Karte merken und in der Kartenliste filtern. Dryade, Goblin und Paladin sind eigene Decks mit den technischen IDs `dryad`, `goblin` und `paladin`.
 
 Die in der folgenden Tabelle aufgeführten Decks verwenden den Vorlagen nachempfundene schwarze SVG-Grafiken mit transparentem Hintergrund. Deckauswahl und Kartenliste verwenden dieselben lokalen Grafiken. Die technischen IDs vorhandener Decks bleiben erhalten, sodass gespeicherte Karten weiterhin zugeordnet werden. Die Beutedecks verwenden ein goldenes Sternmedaillon als SVG mit transparentem Hintergrund; die Zahl wird dynamisch darüber dargestellt.
 

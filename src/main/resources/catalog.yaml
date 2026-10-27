@@ -13,9 +13,6 @@ scanner:
       - id: paladin
         name: Paladin
         icon: "paladin"
-      - id: barbarian
-        name: Barbar
-        icon: "🪓"
       - id: halfling
         name: Hügel-Halbling
         icon: "hill-halfling"
