@@ -3,34 +3,43 @@ scanner:
     decks:
       - id: druid
         name: Druide
-        icon: "🌿"
+        icon: "druid"
+      - id: dryad
+        name: Dryade
+        icon: "dryad"
+      - id: goblin
+        name: Goblin
+        icon: "goblin"
+      - id: paladin
+        name: Paladin
+        icon: "paladin"
       - id: barbarian
         name: Barbar
         icon: "🪓"
       - id: halfling
-        name: Halbling
-        icon: "🍀"
+        name: Hügel-Halbling
+        icon: "hill-halfling"
       - id: dwarf
-        name: Zwerg
-        icon: "🔨"
+        name: Kupfer-Zwerg
+        icon: "copper-dwarf"
       - id: elf
-        name: Elfe
-        icon: "🧝"
+        name: Wald-Elfe
+        icon: "forest-elf"
       - id: warrior
         name: Krieger
-        icon: "🛡️"
+        icon: "warrior"
       - id: troll
-        name: Troll
-        icon: "👹"
+        name: Dschungel-Troll
+        icon: "jungle-troll"
       - id: shaman
         name: Schamane
-        icon: "🪶"
+        icon: "shaman"
       - id: rogue
         name: Schurke
-        icon: "🗡️"
+        icon: "rogue"
       - id: mage
         name: Magier
-        icon: "🪄"
+        icon: "mage"
       - id: items
         name: Gegenstände
         icon: "🎒"

@@ -97,7 +97,11 @@ Für Smartphone-Erfassung die Anwendung über einen HTTPS-Reverse-Proxy mit eine
 
 Decknamen und Symbole, Effekttypen und Beschreibungssymbole werden per YAML konfiguriert. Die Vorgabekonfiguration ist `src/main/resources/catalog.yaml`. Für eigene Symbole zunächst die dortige Datei kopieren und die Einträge anpassen. Die Katalogdatei wird beim Start eingelesen; nach Änderungen die Anwendung neu starten.
 
-Die Standarddecks sind Druide, Barbar, Halbling, Zwerg, Elfe, Krieger, Troll, Schamane (🪶), Schurke, Magier, **Gegenstände (🎒)** und **Beute 1 bis 10**. Alle Decks lassen sich auswählen, für die nächste Karte merken und in der Kartenliste filtern. Die Beutedecks verwenden ein goldenes Sternmedaillon als SVG mit transparentem Hintergrund; die Zahl wird dynamisch darüber dargestellt. Die Standardeffekte sind Nahkampf, Nahkampf-Verstärkung, Fernkampf, Fernkampf-Verstärkung, Karten ziehen, Heilen, Weitere Aktion, Gift zufügen, Direkter Schaden und Sonstige. Für die Beschreibung stehen Schwert, Schild, Feuer, Herz, Blitz, Stern, Karten ziehen, Gift und Gebrochenes Herz bereit.
+Die Standarddecks sind Druide, **Dryade**, **Goblin**, **Paladin**, Barbar, **Hügel-Halbling**, **Kupfer-Zwerg**, **Wald-Elfe**, Krieger, **Dschungel-Troll**, Schamane, Schurke, Magier, **Gegenstände (🎒)** und **Beute 1 bis 10**. Alle Decks lassen sich auswählen, für die nächste Karte merken und in der Kartenliste filtern. Dryade, Goblin und Paladin sind eigene Decks mit den technischen IDs `dryad`, `goblin` und `paladin`.
+
+Die in der folgenden Tabelle aufgeführten Decks verwenden den Vorlagen nachempfundene schwarze SVG-Grafiken mit transparentem Hintergrund. Deckauswahl und Kartenliste verwenden dieselben lokalen Grafiken. Die technischen IDs vorhandener Decks bleiben erhalten, sodass gespeicherte Karten weiterhin zugeordnet werden. Die Beutedecks verwenden ein goldenes Sternmedaillon als SVG mit transparentem Hintergrund; die Zahl wird dynamisch darüber dargestellt.
+
+Die Standardeffekte sind Nahkampf, Nahkampf-Verstärkung, Fernkampf, Fernkampf-Verstärkung, Karten ziehen, Heilen, Weitere Aktion, Gift zufügen, Direkter Schaden und Sonstige. Für die Beschreibung stehen Schwert, Schild, Feuer, Herz, Blitz, Stern, Karten ziehen, Gift und Gebrochenes Herz bereit.
 
 Die Konfigurationsfelder sehen so aus; dieser Auszug zeigt nur einige Einträge:
 
@@ -107,7 +111,7 @@ scanner:
     decks:
       - id: druid
         name: Druide
-        icon: "🌿"
+        icon: "druid"
     effect-types:
       - id: melee
         name: Nahkampf
@@ -127,7 +131,24 @@ scanner:
         icon: "⚔️"
 ```
 
-`id` ist der stabile technische Schlüssel, `name` die sichtbare Beschriftung, `icon` das Unicode-/Emoji-Symbol oder für Beutedecks der Wert `loot:N`. `value-label` benennt das Zahlenfeld eines Effekts. `has-value` ist standardmäßig `true`; `false` blendet das Zahlenfeld aus und erlaubt ausschließlich `null` als Wert. Der Effekttyp `other` aktiviert das zusätzliche Namensfeld für Java-Konstanten und behält seinen optionalen Zahlenwert; hierfür `has-value` bei `true` belassen. Eigene Effekttypen lassen sich ergänzen. Eine externe Liste ersetzt die jeweilige Standardliste vollständig; für kleine Anpassungen daher die vollständige Vorgabedatei kopieren und bearbeiten. Icons werden als Text konfiguriert; Bilddateien und HTML-Markup sind keine Iconwerte. Den voreingestellten Gift-Tropfen (`id: poison`, `icon: "💧"`) stellt die Oberfläche mit einer lokalen SVG-Datei grün dar. Im reinen Beschreibungstext der API bleibt das Unicode-Symbol erhalten.
+`id` ist der stabile technische Schlüssel, `name` die sichtbare Beschriftung, `icon` das Unicode-/Emoji-Symbol, für Beutedecks der Wert `loot:N` oder einer der lokalen Grafikmarker aus der folgenden Tabelle. Diese Einträge auch in einer eigenen Katalogdatei übernehmen. Die jeweiligen SVG-Dateien liegen unter `src/main/resources/static/icons/` und heißen wie der Grafikmarker mit der Endung `.svg`.
+
+| `id` | `name` | `icon` | Motiv |
+| --- | --- | --- | --- |
+| `druid` | Druide | `druid` | Verzweigtes Zeichen |
+| `dryad` | Dryade | `dryad` | Schmales Pflanzenzeichen mit länglichen Innenräumen |
+| `goblin` | Goblin | `goblin` | Gebogenes Runenzeichen mit inneren Streben |
+| `paladin` | Paladin | `paladin` | Runenzeichen mit langem Querarm |
+| `halfling` | Hügel-Halbling | `hill-halfling` | Rauchende Pfeife |
+| `dwarf` | Kupfer-Zwerg | `copper-dwarf` | Kantiges Runenzeichen |
+| `elf` | Wald-Elfe | `forest-elf` | Geschwungene Blattranke mit Spirale |
+| `warrior` | Krieger | `warrior` | Langgezogenes kantiges Zeichen |
+| `rogue` | Schurke | `rogue` | Zwei verbundene, entgegengesetzte Klingen |
+| `mage` | Magier | `mage` | Geschwungene Flamme mit Funken |
+| `troll` | Dschungel-Troll | `jungle-troll` | Ranke |
+| `shaman` | Schamane | `shaman` | Feder mit geschwungener Längsachse |
+
+`value-label` benennt das Zahlenfeld eines Effekts. `has-value` ist standardmäßig `true`; `false` blendet das Zahlenfeld aus und erlaubt ausschließlich `null` als Wert. Der Effekttyp `other` aktiviert das zusätzliche Namensfeld für Java-Konstanten und behält seinen optionalen Zahlenwert; hierfür `has-value` bei `true` belassen. Eigene Effekttypen lassen sich ergänzen. Eine externe Liste ersetzt die jeweilige Standardliste vollständig; für kleine Anpassungen daher die vollständige Vorgabedatei kopieren und bearbeiten. Icons werden als Text konfiguriert; Bilddateien und HTML-Markup sind keine Iconwerte. Den voreingestellten Gift-Tropfen (`id: poison`, `icon: "💧"`) stellt die Oberfläche mit einer lokalen SVG-Datei grün dar. Im reinen Beschreibungstext der API bleibt das Unicode-Symbol erhalten.
 
 Weitere Beutedecks benötigen keine eigene Grafik und keine Codeänderung. `loot:N` zeichnet dieselbe SVG-Grafik mit der Zahl `N` von **1 bis 99**; führende Nullen werden nicht verwendet. Für **Beute 11** und **Beute 12** diese Einträge an die vollständige Deckliste in der Katalogdatei anhängen und anschließend die Anwendung neu starten:
 

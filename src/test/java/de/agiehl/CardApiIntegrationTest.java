@@ -88,8 +88,17 @@ class CardApiIntegrationTest {
     @Test
     void exposesCatalogHealthAndLocalWebjars() throws Exception {
         var catalog = parse(send("GET", "/api/catalog", null));
-        assertThat(catalog.path("decks").size()).isEqualTo(21);
+        assertThat(catalog.path("decks").size()).isEqualTo(24);
         assertThat(catalog.path("decks").get(0).path("name").asString()).isEqualTo("Druide");
+        var dryad = catalogItem(catalog.path("decks"), "dryad");
+        assertThat(dryad.path("name").asString()).isEqualTo("Dryade");
+        assertThat(dryad.path("icon").asString()).isEqualTo("dryad");
+        var goblin = catalogItem(catalog.path("decks"), "goblin");
+        assertThat(goblin.path("name").asString()).isEqualTo("Goblin");
+        assertThat(goblin.path("icon").asString()).isEqualTo("goblin");
+        var paladin = catalogItem(catalog.path("decks"), "paladin");
+        assertThat(paladin.path("name").asString()).isEqualTo("Paladin");
+        assertThat(paladin.path("icon").asString()).isEqualTo("paladin");
         assertThat(catalogItem(catalog.path("decks"), "items").path("name").asString()).isEqualTo("Gegenstände");
         for (var number = 1; number <= 10; number++) {
             var deck = catalogItem(catalog.path("decks"), "loot-" + number);
@@ -102,6 +111,9 @@ class CardApiIntegrationTest {
         assertThat(send("GET", "/webjars/bootstrap/5.3.8/css/bootstrap.min.css", null).statusCode()).isEqualTo(200);
         assertThat(send("GET", "/webjars/jsqr/1.4.0/dist/jsQR.js", null).statusCode()).isEqualTo(200);
         assertThat(send("GET", "/icons/loot.svg", null).statusCode()).isEqualTo(200);
+        assertThat(send("GET", "/icons/dryad.svg", null).statusCode()).isEqualTo(200);
+        assertThat(send("GET", "/icons/goblin.svg", null).statusCode()).isEqualTo(200);
+        assertThat(send("GET", "/icons/paladin.svg", null).statusCode()).isEqualTo(200);
     }
 
     @Test

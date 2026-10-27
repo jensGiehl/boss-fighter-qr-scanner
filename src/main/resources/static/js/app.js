@@ -40,6 +40,16 @@ function catalogIcon(item) {
 }
 
 function deckIcon(deck) {
+  if ([
+    'druid', 'dryad', 'goblin', 'paladin', 'hill-halfling', 'copper-dwarf',
+    'forest-elf', 'warrior', 'jungle-troll', 'shaman', 'rogue', 'mage'
+  ].includes(deck?.icon)) {
+    const icon = node('img', 'icon deck-image');
+    icon.src = `/icons/${deck.icon}.svg`;
+    icon.alt = '';
+    icon.setAttribute('aria-hidden', 'true');
+    return icon;
+  }
   const lootNumber = /^loot:([1-9][0-9]?)$/.exec(deck?.icon || '')?.[1];
   if (!lootNumber) return catalogIcon(deck);
   const svgElement = (tag, attributes) => {
