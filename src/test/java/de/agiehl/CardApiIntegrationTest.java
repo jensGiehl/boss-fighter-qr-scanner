@@ -88,14 +88,20 @@ class CardApiIntegrationTest {
     @Test
     void exposesCatalogHealthAndLocalWebjars() throws Exception {
         var catalog = parse(send("GET", "/api/catalog", null));
-        assertThat(catalog.path("decks").size()).isEqualTo(11);
+        assertThat(catalog.path("decks").size()).isEqualTo(21);
         assertThat(catalog.path("decks").get(0).path("name").asString()).isEqualTo("Druide");
         assertThat(catalogItem(catalog.path("decks"), "items").path("name").asString()).isEqualTo("Gegenstände");
+        for (var number = 1; number <= 10; number++) {
+            var deck = catalogItem(catalog.path("decks"), "loot-" + number);
+            assertThat(deck.path("name").asString()).isEqualTo("Beute " + number);
+            assertThat(deck.path("icon").asString()).isEqualTo("loot:" + number);
+        }
         assertThat(catalog.path("effectTypes").size()).isEqualTo(10);
         assertThat(catalog.path("symbols").size()).isEqualTo(9);
         assertThat(parse(send("GET", "/actuator/health", null)).path("status").asString()).isEqualTo("UP");
         assertThat(send("GET", "/webjars/bootstrap/5.3.8/css/bootstrap.min.css", null).statusCode()).isEqualTo(200);
         assertThat(send("GET", "/webjars/jsqr/1.4.0/dist/jsQR.js", null).statusCode()).isEqualTo(200);
+        assertThat(send("GET", "/icons/loot.svg", null).statusCode()).isEqualTo(200);
     }
 
     @Test
@@ -111,6 +117,33 @@ class CardApiIntegrationTest {
         var filtered = parse(send("GET", "/api/cards?deckId=items", null));
         assertThat(filtered.path("totalElements").asLong()).isEqualTo(1);
         assertThat(filtered.path("content").get(0).path("id")).isEqualTo(created.path("id"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 10})
+    void persistsUpdatesAndFiltersLootDecksWithDynamicDeckNames(int number) throws Exception {
+        var body = card("loot://" + number, "Goldschatz");
+        body.put("deckId", "loot-" + number);
+        body.put("description", List.of(new CardModels.DescriptionToken("variable", null, null, null, "deckName")));
+        var response = send("POST", "/api/cards", body);
+        assertThat(response.statusCode()).isEqualTo(201);
+        var created = parse(response);
+        assertThat(created.path("deckId").asString()).isEqualTo("loot-" + number);
+        assertThat(created.path("descriptionText").asString()).isEqualTo("Beute " + number);
+        var path = "/api/cards/" + created.path("id").asLong();
+        assertThat(parse(send("GET", path, null)).path("deckId").asString()).isEqualTo("loot-" + number);
+        var filtered = parse(send("GET", "/api/cards?deckId=loot-" + number, null));
+        assertThat(filtered.path("totalElements").asLong()).isEqualTo(1);
+        assertThat(filtered.path("content").get(0).path("id")).isEqualTo(created.path("id"));
+        var updatedNumber = number == 1 ? 10 : 1;
+        body.put("version", created.path("version").asLong());
+        body.put("deckId", "loot-" + updatedNumber);
+        assertThat(send("PUT", path, body).statusCode()).isEqualTo(200);
+        var updated = parse(send("GET", path, null));
+        assertThat(updated.path("deckId").asString()).isEqualTo("loot-" + updatedNumber);
+        assertThat(updated.path("descriptionText").asString()).isEqualTo("Beute " + updatedNumber);
+        assertThat(parse(send("GET", "/api/cards?deckId=loot-" + number, null)).path("totalElements").asLong()).isZero();
+        assertThat(parse(send("GET", "/api/cards?deckId=loot-" + updatedNumber, null)).path("totalElements").asLong()).isEqualTo(1);
     }
 
     @Test

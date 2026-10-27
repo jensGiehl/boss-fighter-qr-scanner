@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class CatalogAndDescriptionTest {
     @Test
@@ -27,6 +29,18 @@ class CatalogAndDescriptionTest {
                 .isInstanceOf(IllegalStateException.class).hasMessageContaining("duplicate id");
         assertThatThrownBy(() -> new CatalogService(new CatalogProperties(valid.decks(), List.of(valid.effectTypes().get(0)), valid.symbols())))
                 .isInstanceOf(IllegalStateException.class).hasMessageContaining("other");
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {11, 12, 99})
+    void acceptsAdditionalLootDecksFromConfiguration(int number) {
+        var defaults = catalog("Nahkampf", "Druide");
+        var deck = new CatalogProperties.Deck("loot-" + number, "Beute " + number, "loot:" + number);
+        var service = new CatalogService(new CatalogProperties(List.of(deck), defaults.effectTypes(), defaults.symbols()));
+        assertThat(service.deck(deck.id())).isEqualTo(deck);
+        var renderer = new DescriptionRenderer(service);
+        var description = List.of(new CardModels.DescriptionToken("variable", null, null, null, "deckName"));
+        assertThat(renderer.render("Schatz", deck.id(), "qr", List.of(), description)).isEqualTo("Beute " + number);
     }
 
     private CatalogProperties catalog(String effectName, String deckName) {

@@ -34,6 +34,36 @@ scanner:
       - id: items
         name: Gegenstände
         icon: "🎒"
+      - id: loot-1
+        name: Beute 1
+        icon: "loot:1"
+      - id: loot-2
+        name: Beute 2
+        icon: "loot:2"
+      - id: loot-3
+        name: Beute 3
+        icon: "loot:3"
+      - id: loot-4
+        name: Beute 4
+        icon: "loot:4"
+      - id: loot-5
+        name: Beute 5
+        icon: "loot:5"
+      - id: loot-6
+        name: Beute 6
+        icon: "loot:6"
+      - id: loot-7
+        name: Beute 7
+        icon: "loot:7"
+      - id: loot-8
+        name: Beute 8
+        icon: "loot:8"
+      - id: loot-9
+        name: Beute 9
+        icon: "loot:9"
+      - id: loot-10
+        name: Beute 10
+        icon: "loot:10"
     effect-types:
       - id: melee
         name: Nahkampf

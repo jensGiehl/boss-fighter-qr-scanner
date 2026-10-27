@@ -97,7 +97,7 @@ Für Smartphone-Erfassung die Anwendung über einen HTTPS-Reverse-Proxy mit eine
 
 Decknamen und Symbole, Effekttypen und Beschreibungssymbole werden per YAML konfiguriert. Die Vorgabekonfiguration ist `src/main/resources/catalog.yaml`. Für eigene Symbole zunächst die dortige Datei kopieren und die Einträge anpassen. Die Katalogdatei wird beim Start eingelesen; nach Änderungen die Anwendung neu starten.
 
-Die Standarddecks sind Druide, Barbar, Halbling, Zwerg, Elfe, Krieger, Troll, Schamane (🪶), Schurke, Magier und **Gegenstände (🎒)**. Gegenstände lassen sich wie die anderen Decks auswählen, für die nächste Karte merken und in der Kartenliste filtern. Die Standardeffekte sind Nahkampf, Nahkampf-Verstärkung, Fernkampf, Fernkampf-Verstärkung, Karten ziehen, Heilen, Weitere Aktion, Gift zufügen, Direkter Schaden und Sonstige. Für die Beschreibung stehen Schwert, Schild, Feuer, Herz, Blitz, Stern, Karten ziehen, Gift und Gebrochenes Herz bereit.
+Die Standarddecks sind Druide, Barbar, Halbling, Zwerg, Elfe, Krieger, Troll, Schamane (🪶), Schurke, Magier, **Gegenstände (🎒)** und **Beute 1 bis 10**. Alle Decks lassen sich auswählen, für die nächste Karte merken und in der Kartenliste filtern. Die Beutedecks verwenden ein goldenes Sternmedaillon als SVG mit transparentem Hintergrund; die Zahl wird dynamisch darüber dargestellt. Die Standardeffekte sind Nahkampf, Nahkampf-Verstärkung, Fernkampf, Fernkampf-Verstärkung, Karten ziehen, Heilen, Weitere Aktion, Gift zufügen, Direkter Schaden und Sonstige. Für die Beschreibung stehen Schwert, Schild, Feuer, Herz, Blitz, Stern, Karten ziehen, Gift und Gebrochenes Herz bereit.
 
 Die Konfigurationsfelder sehen so aus; dieser Auszug zeigt nur einige Einträge:
 
@@ -127,7 +127,20 @@ scanner:
         icon: "⚔️"
 ```
 
-`id` ist der stabile technische Schlüssel, `name` die sichtbare Beschriftung, `icon` das Unicode-/Emoji-Symbol. `value-label` benennt das Zahlenfeld eines Effekts. `has-value` ist standardmäßig `true`; `false` blendet das Zahlenfeld aus und erlaubt ausschließlich `null` als Wert. Der Effekttyp `other` aktiviert das zusätzliche Namensfeld für Java-Konstanten und behält seinen optionalen Zahlenwert; hierfür `has-value` bei `true` belassen. Eigene Effekttypen lassen sich ergänzen. Eine externe Liste ersetzt die jeweilige Standardliste vollständig; für kleine Anpassungen daher die vollständige Vorgabedatei kopieren und bearbeiten. Icons werden als Text konfiguriert; Bilddateien und HTML-Markup sind keine Iconwerte. Den voreingestellten Gift-Tropfen (`id: poison`, `icon: "💧"`) stellt die Oberfläche mit einer lokalen SVG-Datei grün dar. Im reinen Beschreibungstext der API bleibt das Unicode-Symbol erhalten.
+`id` ist der stabile technische Schlüssel, `name` die sichtbare Beschriftung, `icon` das Unicode-/Emoji-Symbol oder für Beutedecks der Wert `loot:N`. `value-label` benennt das Zahlenfeld eines Effekts. `has-value` ist standardmäßig `true`; `false` blendet das Zahlenfeld aus und erlaubt ausschließlich `null` als Wert. Der Effekttyp `other` aktiviert das zusätzliche Namensfeld für Java-Konstanten und behält seinen optionalen Zahlenwert; hierfür `has-value` bei `true` belassen. Eigene Effekttypen lassen sich ergänzen. Eine externe Liste ersetzt die jeweilige Standardliste vollständig; für kleine Anpassungen daher die vollständige Vorgabedatei kopieren und bearbeiten. Icons werden als Text konfiguriert; Bilddateien und HTML-Markup sind keine Iconwerte. Den voreingestellten Gift-Tropfen (`id: poison`, `icon: "💧"`) stellt die Oberfläche mit einer lokalen SVG-Datei grün dar. Im reinen Beschreibungstext der API bleibt das Unicode-Symbol erhalten.
+
+Weitere Beutedecks benötigen keine eigene Grafik und keine Codeänderung. `loot:N` zeichnet dieselbe SVG-Grafik mit der Zahl `N` von **1 bis 99**; führende Nullen werden nicht verwendet. Für **Beute 11** und **Beute 12** diese Einträge an die vollständige Deckliste in der Katalogdatei anhängen und anschließend die Anwendung neu starten:
+
+```yaml
+      - id: loot-11
+        name: Beute 11
+        icon: "loot:11"
+      - id: loot-12
+        name: Beute 12
+        icon: "loot:12"
+```
+
+Die API verwendet für die Zuordnung `deckId`, beispielsweise `loot-11`. Der Beschreibungsverweis `deckName` und der Deckfilter übernehmen den konfigurierten Namen automatisch. Bei einer externen Katalogdatei müssen die bisherigen Decks in der Liste erhalten bleiben.
 
 Eine eigene Datei lässt sich schreibgeschützt in Docker einbinden:
 
@@ -184,9 +197,10 @@ node --test tests/js/*.test.mjs
 
 Sie prüfen unter anderem das sofortige Freigeben aller Kameratracks nach einem Scan, Kamerawechsel, verspätete Kameraanfragen, QR-Fallback und Fehler bei verweigerten Berechtigungen.
 
-Die optionalen Browsertests prüfen den Beschreibungseditor, darunter Cursorposition, automatisches Hinzufügen und Entfernen von Effektverweisen, dynamische Verweise, Unicode-Limit, Einfügen als Klartext, Zeilenumbrüche und Rückgängig/Wiederholen. Weitere Tests prüfen die Herkunftsauswahl einschließlich Speichern, Bearbeiten, Verwerfen und Neuladen sowie die fünf zusätzlichen Effekte, Typwechsel und die mobile Darstellung mit grünem Gift-Tropfen. Sie benötigen Node.js 22 oder neuer und einen vorhandenen Microsoft Edge. Jeder Test verwendet ein eigenes temporäres Browserprofil; ohne verfügbaren Browser werden die Tests übersprungen. Mit `EDGE_BINARY` lässt sich der Pfad zum Browser vorgeben.
+Die optionalen Browsertests prüfen den Beschreibungseditor, darunter Cursorposition, automatisches Hinzufügen und Entfernen von Effektverweisen, dynamische Verweise, Unicode-Limit, Einfügen als Klartext, Zeilenumbrüche und Rückgängig/Wiederholen. Weitere Tests prüfen die Herkunftsauswahl einschließlich Speichern, Bearbeiten, Verwerfen und Neuladen sowie die fünf zusätzlichen Effekte, Typwechsel und die mobile Darstellung mit grünem Gift-Tropfen. Für Beutedecks werden ein- und zweistellige SVG-Zahlen, der transparente Hintergrund, die mobile Darstellung sowie Speichern, Bearbeiten und Filtern geprüft. Sie benötigen Node.js 22 oder neuer und einen vorhandenen Microsoft Edge. Jeder Test verwendet ein eigenes temporäres Browserprofil; ohne verfügbaren Browser werden die Tests übersprungen. Mit `EDGE_BINARY` lässt sich der Pfad zum Browser vorgeben.
 
 ```bash
 node --test tests/browser/description-editor.test.mjs
 node --test tests/browser/effects.test.mjs
+node --test tests/browser/loot-decks.test.mjs
 ```

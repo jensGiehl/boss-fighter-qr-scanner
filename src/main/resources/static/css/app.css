@@ -7,4 +7,5 @@
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 .description-limit-reached{outline:2px solid var(--danger);outline-offset:-2px}.label-counter.is-invalid{color:var(--danger)}
 .catalog-icon{display:inline-block;line-height:1.1;vertical-align:-.1em}.poison-icon{color:transparent;background:url("/icons/poison.svg") center/contain no-repeat}.effect-row>.icon{font-size:19px;width:22px;flex:0 0 22px;text-align:center}.symbol-buttons{flex-wrap:wrap;max-width:100%}
+.loot-icon{display:inline-block;width:1.65em;height:1.65em;flex-shrink:0;vertical-align:middle;overflow:hidden}.card-tag .loot-icon{width:2em;height:2em;margin:-2px 1px -2px 0}
 @media(max-width:575px){.form-control,.form-select,.description-editor{font-size:16px}.form-label,.field-title{font-size:12px}.symbol-button{min-width:40px;min-height:44px}.icon-button{min-width:36px;min-height:44px}.effect-choice{min-height:44px;font-size:10px}.deck-button .deck-name{font-size:9px}.toolbar-select{min-height:44px}.effect-row .form-control{font-size:16px}}

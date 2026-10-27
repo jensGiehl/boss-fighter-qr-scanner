@@ -39,6 +39,21 @@ function catalogIcon(item) {
   return icon;
 }
 
+function deckIcon(deck) {
+  const lootNumber = /^loot:([1-9][0-9]?)$/.exec(deck?.icon || '')?.[1];
+  if (!lootNumber) return catalogIcon(deck);
+  const svgElement = (tag, attributes) => {
+    const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.entries(attributes).forEach(([name, value]) => element.setAttribute(name, value));
+    return element;
+  };
+  const icon = svgElement('svg', { class: 'icon loot-icon', viewBox: '0 0 160 160', 'aria-hidden': 'true', focusable: 'false' });
+  const number = svgElement('text', { x: '80', y: '108', 'text-anchor': 'middle', 'font-family': 'Georgia, "Times New Roman", serif', 'font-size': lootNumber.length === 1 ? '88' : '80', 'font-weight': '700', 'letter-spacing': lootNumber.length === 1 ? '0' : '-5', fill: '#211b12' });
+  number.textContent = lootNumber;
+  icon.append(svgElement('image', { href: '/icons/loot.svg', width: '160', height: '160' }), number);
+  return icon;
+}
+
 function hasEffectValue(typeId) {
   return state.catalog.effectTypes.find(type => type.id === typeId)?.hasValue !== false;
 }
@@ -126,7 +141,7 @@ function paintDecks() {
       if (state.effects.length === 0) $('effectChoices').querySelector('button')?.focus();
     }, `Deck ${deck.name}`);
     choice.dataset.id = deck.id;
-    choice.append(node('span', 'icon', deck.icon), node('span', 'deck-name', deck.name));
+    choice.append(deckIcon(deck), node('span', 'deck-name', deck.name));
     $('deckButtons').append(choice);
     $('deckFilter').add(new Option(deck.name, deck.id));
   });
@@ -436,7 +451,9 @@ async function loadCards() {
       title.append(labels);
       const tags = node('div', 'card-tags');
       const deck = state.catalog.decks.find(item => item.id === card.deckId);
-      tags.append(node('span', 'card-tag', `${deck?.icon || ''} ${deck?.name || card.deckId}`));
+      const deckTag = node('span', 'card-tag');
+      deckTag.append(deckIcon(deck), document.createTextNode(` ${deck?.name || card.deckId}`));
+      tags.append(deckTag);
       tags.append(node('span', 'card-tag', sourceLabel(card.sourceId)));
       card.effects.forEach(effect => {
         const type = state.catalog.effectTypes.find(item => item.id === effect.typeId);
