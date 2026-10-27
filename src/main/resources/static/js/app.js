@@ -159,6 +159,7 @@ function addEffect(typeId) {
   if (state.effects.length >= 50) { fieldError('effects', 'Maximal 50 Effekte pro Karte.'); return; }
   const effect = { id: uuid(), typeId, value: typeId === 'other' || !hasEffectValue(typeId) ? null : 0, customName: '' };
   state.effects.push(effect);
+  editor.appendEffect(effect.id);
   paintEffects();
   markDirty();
   updateReferences();

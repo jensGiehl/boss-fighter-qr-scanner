@@ -93,31 +93,54 @@ export class DescriptionEditor {
         return this.insertSegments([{kind: "effect", effectId: String(effectId)}]);
     }
 
+    appendEffect(effectId) {
+        if (this.destroyed) return false;
+        const selection = this.element.contains(document.activeElement)
+            ? this.captureSelection() ?? this.savedSelection
+            : this.savedSelection;
+        const length = this.logicalLength(this.segments);
+        const next = [...this.getSegments()];
+        const text = this.getText();
+        if (text && !/\s$/.test(text)) next.push({kind: "text", text: " "});
+        next.push({kind: "effect", effectId: String(effectId)});
+        const end = this.logicalLength(next);
+        this.beforeInputSelection = selection;
+        return this.commit(next, selection.start === length && selection.end === length
+            ? {start: end, end, backward: false}
+            : selection, false);
+    }
+
     insertVariable(variable) {
         if (!Object.hasOwn(VARIABLE_LABELS, variable)) return false;
         return this.insertSegments([{kind: "variable", variable}]);
     }
 
     removeEffectReferences(effectId) {
-        const text = this.effectText(String(effectId));
-        const next = this.segments.map(segment => segment.kind === "effect" && segment.effectId === String(effectId)
-            ? {kind: "text", text}
-            : segment);
+        const id = String(effectId);
+        const withoutEffect = segments => segments.filter(segment => segment.kind !== "effect" || segment.effectId !== id);
         const selection = this.captureSelection() ?? this.savedSelection;
-        const replacements = this.segments.filter(segment => segment.kind === "effect" && segment.effectId === String(effectId));
-        if (!replacements.length) return;
-        const start = this.convertedOffset(selection.start, String(effectId), text.length);
-        const end = this.convertedOffset(selection.end, String(effectId), text.length);
-        this.commit(next, {start, end, backward: selection.backward}, false);
+        const start = this.convertedOffset(selection.start, id);
+        const end = this.convertedOffset(selection.end, id);
+        this.beforeInputSelection = selection;
+        this.commit(withoutEffect(this.segments), {start, end, backward: selection.backward}, false);
+        this.history = this.history.map(entry => ({
+            segments: this.normalizeSegments(withoutEffect(entry.segments)),
+            selection: {
+                start: this.convertedOffset(entry.selection.start, id, entry.segments),
+                end: this.convertedOffset(entry.selection.end, id, entry.segments),
+                backward: entry.selection.backward
+            }
+        }));
+        this.referenceLabels.delete(id);
     }
 
-    convertedOffset(offset, effectId, textLength) {
+    convertedOffset(offset, effectId, segments = this.segments) {
         let position = 0;
         let converted = offset;
-        for (const segment of this.segments) {
+        for (const segment of segments) {
             const length = segment.kind === "text" ? segment.text.length : 1;
             if (segment.kind === "effect" && segment.effectId === effectId && position < offset) {
-                converted += textLength - 1;
+                converted--;
             }
             position += length;
         }

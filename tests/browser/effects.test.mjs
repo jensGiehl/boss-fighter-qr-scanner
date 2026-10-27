@@ -252,8 +252,9 @@ test('new effects survive mobile editing and persistence in a real browser', { s
       ]);
       assert.deepEqual(await browser.evaluate(`Array.from(document.querySelectorAll('#effectRows .effect-value'), input => input.getAttribute('aria-label'))`), ['Karten von Effekt 1', 'Heilung von Effekt 2', 'Gift von Effekt 4', 'Schaden von Effekt 5']);
       const effectIds = await browser.evaluate(`Array.from(document.querySelectorAll('#effectRows .effect-row'), row => row.dataset.id)`);
-      for (const id of effectIds) await choose('#effectReference', id);
+      assert.deepEqual(await browser.evaluate(`Array.from(document.querySelectorAll('#descriptionEditor [data-kind="effect"]'), token => token.dataset.effectId)`), effectIds);
       assert.deepEqual(await references(), ['Karten ziehen 2', 'Heilen 3', 'Weitere Aktion', 'Gift zufügen 4', 'Direkter Schaden 5']);
+      assert.equal(await browser.evaluate('document.activeElement.classList.contains("effect-value")'), true);
     });
 
     await t.test('switching between numeric effects and further actions refreshes references and clears stale numbers', async () => {
@@ -275,7 +276,12 @@ test('new effects survive mobile editing and persistence in a real browser', { s
       await fill('#effectRows .effect-row:last-child .effect-name', 'BONUS');
       await fill('#effectRows .effect-row:last-child .effect-value', '');
       assert.equal((await rows()).at(-1).value, '');
+      const id = await browser.evaluate(`document.querySelector('#effectRows .effect-row:last-child').dataset.id`);
+      await choose('#effectReference', id);
+      assert.equal((await references()).filter(text => text === 'BONUS').length, 2);
       await click('#effectRows .effect-row:last-child [aria-label="Effekt 6 entfernen"]');
+      assert.deepEqual(await references(), ['Karten ziehen 9', 'Heilen 3', 'Weitere Aktion', 'Gift zufügen 4', 'Direkter Schaden 5']);
+      assert.equal(await browser.evaluate(`document.querySelector('#descriptionEditor').textContent.includes('BONUS')`), false);
     });
 
     await t.test('symbols and green poison drops fit a 375 pixel mobile viewport', async () => {

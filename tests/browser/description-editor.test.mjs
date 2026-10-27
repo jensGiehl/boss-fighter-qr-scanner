@@ -58,14 +58,19 @@ test('description editor in a real browser', { skip, timeout: 30_000 }, async t 
       assert.match(result.invalid, /402/);
     });
 
-    await t.test('removing an effect preserves its last text and undo blocks a dangling reference', async () => {
-      await browser.evaluate("editor.setSegments([{ kind: 'effect', effectId: 'effect1' }]); ctx.effects = []; editor.removeEffectReferences('effect1');");
-      assert.equal(await browser.evaluate('editor.getText()'), 'Nahkampf 12345');
+    await t.test('removing an effect deletes all its references and keeps text, cursor and history valid', async () => {
+      await browser.evaluate("editor.setSegments([{ kind: 'text', text: 'Vor ' }, { kind: 'effect', effectId: 'effect1' }, { kind: 'text', text: ' / ' }, { kind: 'effect', effectId: 'effect1' }, { kind: 'text', text: ' nach' }]); editor.focus(); ctx.effects = []; editor.removeEffectReferences('effect1');");
+      assert.equal(await browser.evaluate('editor.getText()'), 'Vor  /  nach');
       assert.ok(!(await browser.evaluate('editor.getSegments()')).some(segment => segment.kind === 'effect'));
-      await browser.evaluate('editor.focus()');
+      await browser.type('!');
+      assert.equal(await browser.evaluate('editor.getText()'), 'Vor  /  nach!');
       await browser.key('z', 'KeyZ', 90, 2);
-      assert.ok((await browser.evaluate('editor.getSegments()')).some(segment => segment.kind === 'effect'));
-      assert.match(await browser.evaluate('invalid'), /nicht mehr verfügbar/);
+      await browser.key('z', 'KeyZ', 90, 2);
+      assert.ok(!(await browser.evaluate('editor.getSegments()')).some(segment => segment.kind === 'effect'));
+      assert.equal(await browser.evaluate('invalid'), null);
+      await browser.key('z', 'KeyZ', 90, 10);
+      assert.ok(!(await browser.evaluate('editor.getSegments()')).some(segment => segment.kind === 'effect'));
+      assert.equal(await browser.evaluate('invalid'), null);
     });
 
     await t.test('native input after a trailing newline and keyboard undo/redo retain line breaks', async () => {
@@ -83,6 +88,32 @@ test('description editor in a real browser', { skip, timeout: 30_000 }, async t 
       assert.equal(await browser.evaluate('editor.getText()'), 'Nahkampf 3');
       await browser.evaluate("ctx.effects[0].typeId = 'other'; editor.refreshReferences();");
       assert.equal(await browser.evaluate('editor.getText()'), 'POISON_EXPLOSION 3');
+    });
+
+    await t.test('automatic references append without replacing selected text or moving focus', async () => {
+      await browser.evaluate(`(() => {
+        ctx.effects = [{ id: 'effect1', typeId: 'melee', value: 3 }];
+        editor.setSegments([{ kind: 'text', text: 'Vorhandener Text' }]);
+        editor.focus();
+        window.getSelection().setBaseAndExtent(editor.element.firstChild, 0, editor.element.firstChild, 11);
+        editor.handleSelectionChange();
+        document.querySelector('#toolbar').focus();
+        editor.appendEffect('effect1');
+      })()`);
+      assert.equal(await browser.evaluate('editor.getText()'), 'Vorhandener Text Nahkampf 3');
+      assert.equal(await browser.evaluate('document.activeElement.id'), 'toolbar');
+      assert.deepEqual(await browser.evaluate('editor.savedSelection'), { start: 0, end: 11, backward: false });
+      await browser.evaluate("ctx.effects[0].value = 4; editor.refreshReferences();");
+      assert.equal(await browser.evaluate('editor.getText()'), 'Vorhandener Text Nahkampf 4');
+    });
+
+    await t.test('automatic references above the limit remain visible and removal restores validity', async () => {
+      await browser.evaluate("editor.setSegments([{ kind: 'text', text: 'a'.repeat(399) }]); editor.appendEffect('effect1');");
+      assert.ok((await browser.evaluate('editor.getSegments()')).some(segment => segment.kind === 'effect'));
+      assert.match(await browser.evaluate('invalid'), /410/);
+      await browser.evaluate("editor.removeEffectReferences('effect1');");
+      assert.equal(await browser.evaluate('editor.getText()'), 'a'.repeat(399) + ' ');
+      assert.equal(await browser.evaluate('invalid'), null);
     });
   } finally { await browser.close(); }
 });
